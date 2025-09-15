@@ -92,3 +92,20 @@ def summarize(outcomes, horizons=(1, 3, 5, 10, 20)):
         })
     return pd.DataFrame(summary)
 
+def makeEventTable(df, eventIndex):
+    """
+    Build a compact table of event dates and details.
+    Columns: Date, EventMovePct (close/close), Open, Close, Volume
+    """
+    rows = []
+    for ts in eventIndex:
+        rows.append({
+            "Date": ts.strftime("%Y-%m-%d"),
+            "EventMovePct": float(df.loc[ts, "ret1"]),  # already close/close % change
+            "Open": float(df.loc[ts, "Open"]),
+            "Close": float(df.loc[ts, "Close"]),
+            "Volume": int(df.loc[ts, "Volume"])
+        })
+    if not rows:
+        return pd.DataFrame(columns=["Date", "EventMovePct", "Open", "Close", "Volume"])
+    return pd.DataFrame(rows).sort_values("Date").reset_index(drop=True)
